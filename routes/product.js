@@ -7,7 +7,7 @@ router.use(cors({
 }))
 
 
-const {create,productById,read,remove,update,list,related,listCategories,listBySearch,photo} = require('../controllers/product')
+const {create,productById,read,remove,update,list,related,listCategories,listBySearch,photo,listSearch} = require('../controllers/product')
 
 const {requireSignin,isAdmin,isAuth} = require('../controllers/auth')
 
@@ -18,7 +18,9 @@ router.post('/create/:userId',requireSignin,isAuth,isAdmin,create);
 
 router.get('/products',list)
 
-router.get('/prodids/:productId',read)
+router.get("/products/search", listSearch);
+
+router.get('/product/:productId',read)
 
 router.get('/prod/categories',listCategories)
 

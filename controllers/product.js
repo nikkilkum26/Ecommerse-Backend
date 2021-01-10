@@ -4,6 +4,7 @@ const {errorHandler} = require('../helpers/dbErrorHandler');
 const formidable = require('formidable')
 const _ =require('lodash')
 const fs = require('fs');
+const { query } = require('express');
 
 
 
@@ -28,7 +29,7 @@ exports.list = (req,res)=>{
 }
 
 exports.productById = (req,res,next,id)=>{
-    Product.findById(id).exec((err,product)=>{
+    Product.findById(id).populate("category").exec((err,product)=>{
         if(err || !product){
             return res.status(400).json({
             error:"Product not found!"
@@ -209,4 +210,22 @@ exports.photo=(req,res,next)=>{
         return res.send(req.product.photo.data)
     }
     next()
+}
+
+exports.listSearch =(req,res)=>{
+    const query ={}
+    if(req.query.search){
+        query.name ={$regex : req.query.search,$options: 'i'}
+        if(req.query.category && req.query.category !== 'All'){
+            query.category = req.query.category
+        }
+        Product.find(query,(err,products)=>{
+            if(err){
+                return res.status(400).json({
+                    error: errorHandler(err)
+                })
+            }
+            res.json(products)
+        }).select('-photo')
+    }
 }
